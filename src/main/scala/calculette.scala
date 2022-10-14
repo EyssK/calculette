@@ -3,18 +3,10 @@ package calculette
 
 object Calc {
 
-    trait Operator {
-        def eval(l: Int)(r: Int) : Int
-    }
-
-    case object + extends Operator {
-        def eval(l: Int)(r: Int) : Int = l+r
-    }
-
-    case object - extends Operator {
-        def eval(l: Int)(r: Int) : Int = l-r
-    }
-    //case object * extends Operator
+    trait Operator 
+    case object + extends Operator 
+    case object - extends Operator    
+    case object * extends Operator
     //case object / extends Operator
 
     /**
@@ -27,7 +19,11 @@ object Calc {
 
     def evaluate(tree: Tree) : Int = tree match {
         case Leaf(v) => v
-        case Node(o,l,r) => o.eval( evaluate(l) )( evaluate(r) )
+        case Node(+,l,r) => evaluate(l) + evaluate(r)
+        case Node(-,l,r) => evaluate(l) - evaluate(r)
+        // need to evaluate * first !!
+        case Node(*,l,r) => evaluate(l) * evaluate(r)
+        //case _ => println(s"""Error, Bad Tree"""); val a = Unit
     }
 
     sealed trait Token
@@ -45,6 +41,7 @@ object Calc {
             else str2.head match {
                 case '+' => doTheJob(str2.tail, OpToken("+") :: acc )
                 case '-' => doTheJob(str2.tail, OpToken("-") :: acc )
+                case '*' => doTheJob(str2.tail, OpToken("*") :: acc )
                 case x if x.isDigit => 
                     doTheJob(str2.dropWhile(_.isDigit), DigitToken(str2.takeWhile(_.isDigit)) :: acc )
                 case ' ' => doTheJob(str2.tail, acc )
@@ -58,6 +55,7 @@ object Calc {
         s match {
             case "+" => +
             case "-" => -
+            case "*" => *
         }
     }
 
